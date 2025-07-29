@@ -22,7 +22,7 @@ export const addUser = async (req, res) =>
              $or:[{email: email}, {firstName: firstName, lastName: lastName}]
                                                     //and
         });
-         if (!isEmailExists)
+         if (isEmailExists)
          {
             return res.status(409).json({ message: 'Email already exists' });
          }
@@ -58,7 +58,7 @@ age,
 email,  
 password,
 gender,
-encryptPhoneNumber
+phoneNumber:encryptPhoneNumber
         });
     return res.status(201).json({
 

@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { buffer, text } from 'stream/consumers';
 
 const IV_LENGTH=16
-const ENCRYPTION_SECRET_KEY=Buffer.from('SMDKMSDKMDSKKMDks@3333'); // this is a secret key that will be used to encrypt and decrypt the data , bufferfrom returns binary and it is a must for the crypto function
+const ENCRYPTION_SECRET_KEY=Buffer.from('12345678901234567890123456789012'); // this is a secret key that will be used to encrypt and decrypt the data , bufferfrom returns binary and it is a must for the crypto function
 // IN SYMMETRIC ENCRYPTION WE USE THE SAME KEY TO ENCRYPT AND DECRYPT THE DATA
 
 export const encryptData = (data) => {
@@ -21,7 +21,7 @@ export const encryptData = (data) => {
 
 
 
-let encrpytedData =cipher.update(text,'utf-8','hex')
+let encrpytedData =cipher.update(data,'utf-8','hex')
 //? keda step 2 update di ely bettal3 el encypton 
 
 
@@ -33,7 +33,7 @@ encrpytedData+= cipher.final('hex')
 
 
 
-return `${iv.toString('hex')}  : ${{encrpytedData}}`  // d2a mogarad return way(momken be ay tari2a) we need the iv in the decreption 
+return `${iv.toString('hex')}  : ${encrpytedData}`  // d2a mogarad return way(momken be ay tari2a) we need the iv in the decreption 
 
 // so we must even if we save or retreieve the enctypted store or save with it the iv 3shan we ehna bne3ml decreption
 // iv can be not secured normally
@@ -51,4 +51,3 @@ return `${iv.toString('hex')}  : ${{encrpytedData}}`  // d2a mogarad return way(
   * 
   */
 
- 
