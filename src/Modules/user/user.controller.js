@@ -9,6 +9,6 @@ userRouter.put('/update/:userId', userService.UpdateService); // Route to update
 userRouter.delete('/delete/:userId', userService.DeleteService); // Route to delete a user by ID
 
 
-
+// we will encrypt the phone number when the user sign up and decrypt it when the user retrieve or view their profile 
 
 export default userRouter;

@@ -4,7 +4,7 @@ export const addUser = async (req, res) =>
 {
 
     try 
-    {   const{ firstName, lastName, age,email, password,gender } = req.body;
+    {   const{ firstName, lastName, age,email, password,gender,phoneNumber } = req.body;
         // Validate the input data
 
         // lazem ne3ml find el user by email to check if the user already exists abl ma ne3ml create 3shan el error yegy menna mesh men el database
@@ -41,13 +41,20 @@ export const addUser = async (req, res) =>
           * *insertMany => to insert multiple documents at once (bulk insert array of documents)
           *
           */
+
+// session 10 week 2 :
+//We will encrypt the phnoe number when the user sign up and decrypt it when the user retrieve or view their profile
+// here we will encypt the phone number before saving it to the database
+// we can encrpyt anything so it is a common function so we can create a utility function to encrypt and decrypt the phone number\
+// use utilites files
         const user= await User.create({
 firstName,
 lastName,
 age,
 email,  
 password,
-gender
+gender,
+phoneNumber
         });
     return res.status(201).json({
 
@@ -239,3 +246,5 @@ export const DeleteService = async (req, res) => {
 
 
 }
+
+

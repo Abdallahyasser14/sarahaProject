@@ -35,10 +35,10 @@ age :
     required: true,
     min: [0,"age must be greater than or equal to 0"],
     max: [120,"age must be less than or equal to 120"],
-    index : true // create an index on the age field for faster queries bs how haye3ml leih esm men nafso
-// index on path level becase we are creating an index on the age field we fi tari2a tanya we can create an index on the schema level nfs el haga 
+    index : true // create an index on the age field for faster queries bs howa haye3ml leih esm men nafso
+// index on path level because we are creating an index on the age field we fi tari2a tanya we can create an index on the schema level nfs el haga 
     // index :{
-    //     name: "age_index", // name of the index  keda law 3awez asmy
+    //     name: "age_index", // name of the index  keda law 3awez asmy el index
     // }
 },
 gender :
@@ -71,6 +71,19 @@ password: {
         return value;
     }
 },
+
+phoneNumber: {
+    type: String,
+    required: true,
+  //  unique: true, // unique index on the phoneNumber field
+    trim: true, // remove spaces from the start and end
+    set(value) {
+        // this is a setter function it will be called when the user saves the phone number
+        // we can use it to encrypt the phone number before saving it to the database
+        return value; // for now we will just return the value as it is
+    }
+
+}
 
 
 
