@@ -1,4 +1,5 @@
 import User from "../../../DB/Models/user.model.js";
+import { encryptData } from "../../../Utils/encryption.utilis.js";
 
 export const addUser = async (req, res) =>
 {
@@ -47,6 +48,9 @@ export const addUser = async (req, res) =>
 // here we will encypt the phone number before saving it to the database
 // we can encrpyt anything so it is a common function so we can create a utility function to encrypt and decrypt the phone number\
 // use utilites files
+
+const encryptPhoneNumber=encryptData(phoneNumber);
+console.log("kdjkfdjfkdj  ",encryptPhoneNumber)
         const user= await User.create({
 firstName,
 lastName,
@@ -54,7 +58,7 @@ age,
 email,  
 password,
 gender,
-phoneNumber
+encryptPhoneNumber
         });
     return res.status(201).json({
 
