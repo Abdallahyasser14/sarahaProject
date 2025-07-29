@@ -1,5 +1,5 @@
 import User from "../../../DB/Models/user.model.js";
-import { encryptData } from "../../../Utils/encryption.utilis.js";
+import { decrypt, encryptData } from "../../../Utils/encryption.utilis.js";
 
 export const addUser = async (req, res) =>
 {
@@ -251,4 +251,17 @@ export const DeleteService = async (req, res) => {
 
 }
 
+
+export const ListUsers =async(req,res)=>
+{
+     let users=await User.find()
+     users=users.map((user)=> 
+    { return{
+        ...user._doc,
+        phoneNumber:decrypt(user.phoneNumber)
+     }
+    }
+    )
+res.status(200).json({users})
+}
 

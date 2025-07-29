@@ -51,3 +51,17 @@ return `${iv.toString('hex')}  : ${encrpytedData}`  // d2a mogarad return way(mo
   * 
   */
 
+
+export const decrypt = (encryptedString) => {
+  const [ivHex, encryptedHex] = encryptedString.split(':');
+
+  const iv = Buffer.from(ivHex.trim(), 'hex');         // Convert IV back to buffer
+  const encrypted = encryptedHex.trim();
+
+  const decipher = crypto.createDecipheriv('aes-256-cbc', ENCRYPTION_SECRET_KEY,iv);
+
+  let decrypted = decipher.update(encrypted, 'hex', 'utf-8');
+  decrypted += decipher.final('utf-8');
+
+  return decrypted;
+};
