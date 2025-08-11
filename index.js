@@ -2,7 +2,7 @@ import express from 'express';
 import dbConnection from './src/DB/Models/db.connection.js';
 import userRouter from './src/Modules/user/user.controller.js';
 import messageRouter from './src/Modules/messages/messages.controller.js';
-
+import bcrypt from 'bcrypt';
 const app = express();
 // Connect to the database it will retry to connect if it fails until it time out
 // if the database is not running it will throw an error after 30 seconds

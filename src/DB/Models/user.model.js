@@ -60,16 +60,9 @@ password: {
     type: String,
     required: true,
     minLength: [6,"min length is 6"],
-    maxLength: 50,
+   // maxLength: 50,
     select: false ,// this field will not be returned in the response by default,
-    set (value)
-    {
-        // this is a setter function it will be called when the user saves the password
-        // we can use it to hash the password before saving it to the database
-        // we can use bcrypt or any other library to hash the password
-        // for now we will just return the value as it is
-        return value;
-    }
+   
 },
 
 phoneNumber: {

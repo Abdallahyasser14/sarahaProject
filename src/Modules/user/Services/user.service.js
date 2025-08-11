@@ -1,6 +1,6 @@
 import User from "../../../DB/Models/user.model.js";
-import { decrypt, encryptData } from "../../../Utils/encryption.utilis.js";
-
+import { decrypt, encryptData,assymetricEncryption,assymetricDecryption} from "../../../Utils/encryption.utilis.js";
+import bcrypt from 'bcrypt';
 export const addUser = async (req, res) =>
 {
 
@@ -43,20 +43,32 @@ export const addUser = async (req, res) =>
           *
           */
 
-// session 10 week 2 :
+//!     *session 10 week 2* encryption and decryption :
 //We will encrypt the phnoe number when the user sign up and decrypt it when the user retrieve or view their profile
 // here we will encypt the phone number before saving it to the database
-// we can encrpyt anything so it is a common function so we can create a utility function to encrypt and decrypt the phone number\
+// we can encrpyt anything not the phone numnber only so it is a common function so we can create a utility function to encrypt and decrypt the phone number or any field
 // use utilites files
 
-const encryptPhoneNumber=encryptData(phoneNumber);
-console.log("kdjkfdjfkdj  ",encryptPhoneNumber)
+//const encryptPhoneNumber=encryptData(phoneNumber);
+const encryptPhoneNumber= assymetricEncryption(phoneNumber);
+
+//!     *session 10 week 2* part2 hash password :
+// we will hash the password before saving it to the database
+// we can use bcrypt or any other library to hash the password
+// we will use bcrypt to hash the password and compare it with the password in the database
+
+const hashPassword=bcrypt.hashSync(password,10);
+                                  //10 is the number of salt rounds
+
+// or we can use async function
+//const hashPassword=await bcrypt.hash(password,10);
+
         const user= await User.create({
 firstName,
 lastName,
 age,
 email,  
-password,
+password:hashPassword,
 gender,
 phoneNumber:encryptPhoneNumber
         });
@@ -80,7 +92,7 @@ export const signInUser = async (req, res) =>
 {
     try 
     {
-        const { email, password } = req.body;
+        const {email, password} = req.body;
 
         // Validate the input data
         if (!email || !password) {
@@ -88,20 +100,33 @@ export const signInUser = async (req, res) =>
         }
 
         // Find the user by email
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).select("+password");
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         // Check if the password matches (assuming you have a method to compare passwords)
-        if (user.password !== password) {
+        // if (user.password !== password) {
+        //     return res.status(401).json({ message: 'Invalid password' });
+        // }
+      
+      
+        //! session 10 week 2 part2 hash password :
+        // compare the password with the hash password
+        const isPasswordMatched=bcrypt.compareSync(password,user.password);  // compareSync is a method that compares the password with the hash password saved in the database
+        if (!isPasswordMatched) {
             return res.status(401).json({ message: 'Invalid password' });
         }
 
         // If everything is fine, return the user data (excluding password)
         const { password: _, ...userData } = user.toObject();
         
+
+        //! session 10 week 2 part1 encryption :
+        // decrypt the phone number
+        const decryptPhoneNumber=assymetricDecryption(user.phoneNumber);
+        userData.phoneNumber=decryptPhoneNumber;
         return res.status(200).json({
             message: 'User signed in successfully',
             user: userData
@@ -254,14 +279,24 @@ export const DeleteService = async (req, res) => {
 
 export const ListUsers =async(req,res)=>
 {
+    try
+    {
      let users=await User.find()
      users=users.map((user)=> 
     { return{
         ...user._doc,
-        phoneNumber:decrypt(user.phoneNumber)
+        phoneNumber:assymetricDecryption(user.phoneNumber)
      }
     }
     )
 res.status(200).json({users})
 }
+
+    catch (error) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+
+
+}
+
 
