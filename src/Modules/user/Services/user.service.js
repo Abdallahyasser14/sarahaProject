@@ -1,8 +1,15 @@
 import User from "../../../DB/Models/user.model.js";
 import { decrypt, encryptData,assymetricEncryption,assymetricDecryption} from "../../../Utils/encryption.utilis.js";
 import bcrypt from 'bcrypt';
+import { hashSync } from 'bcrypt';
+import { sendEmail } from "../../../Utils/send-email.utils.js";
+import { customAlphabet,nanoid } from "nanoid";    
+import { EventEmitter} from 'events';
+import {eventEmitter} from "../../../Utils/send-email.utils.js";
+const OTP_generate = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
 export const addUser = async (req, res) =>
 {
+    const otp=OTP_generate();
 
     try 
     {   const{ firstName, lastName, age,email, password,gender,phoneNumber } = req.body;
@@ -57,7 +64,7 @@ const encryptPhoneNumber= assymetricEncryption(phoneNumber);
 // we can use bcrypt or any other library to hash the password
 // we will use bcrypt to hash the password and compare it with the password in the database
 
-const hashPassword=bcrypt.hashSync(password,10);
+const hashPassword=bcrypt.hashSync(password,+process.env.SALT_ROUNDS);
                                   //10 is the number of salt rounds
 
 // or we can use async function
@@ -70,8 +77,28 @@ age,
 email,  
 password:hashPassword,
 gender,
-phoneNumber:encryptPhoneNumber
+phoneNumber:encryptPhoneNumber,
+otps:{confirmation:hashSync(otp,+process.env.SALT_ROUNDS)}, //? we will hash the otp before saving it to the database and ensure integrity of the otp
+isConfirmed:false
         });
+ 
+
+
+        // !  week 11 session 1 (send email)
+
+        eventEmitter.emit("sendEmail",{
+            to:email,
+            subject:"User added successfully",
+            html:`User added successfully, your OTP is ${otp}`,
+            //? attachments is an array of objects that contains the file name, path (law 3awez teb3at sowar aw files) bethot el esm we el path
+            // attachments:[{
+            //     filename:"user.png",
+            //     path:"./user.png",
+            //    
+            // }]
+        });
+
+
     return res.status(201).json({
 
         message: 'User added successfully',user
@@ -87,7 +114,31 @@ phoneNumber:encryptPhoneNumber
         res.status(500).json({ message: 'Internal server error' });
     }
 }
+export const confirmUser = async (req, res) =>
+{
+    try 
+    {
+        const {email, otp} = req.body;
+        const user = await User.findOne({ email,isConfirmed:false }); // find the user by email and isConfirmed false 
+        if (!user) {
+            return res.status(404).json({ message: 'User not found or already confirmed' });
+        }
+        const isOtpMatched = bcrypt.compareSync(otp, user.otps?.confirmation); // compare the otp with the hashed otp in the database 
+        if (!isOtpMatched) {
+            return res.status(401).json({ message: 'Invalid OTP' });
+        }
+        // update the user
+        user.isConfirmed = true;
+        user.otps.confirmation = undefined; // remove the otp from the database not just null remove it
 
+        await user.save();
+        return res.status(200).json({ message: 'User confirmed successfully' });
+    }
+    catch (error) {
+        console.error('Error confirming user:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
 export const signInUser = async (req, res) =>
 {
     try 

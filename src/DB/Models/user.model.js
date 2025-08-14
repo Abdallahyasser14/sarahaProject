@@ -76,6 +76,15 @@ phoneNumber: {
         return value; // for now we will just return the value as it is
     }
 
+},
+otps:{
+    confirmation:String,
+    resetPassword:String,
+
+},
+isConfirmed:{
+    type:Boolean,
+    default:false
 }
 
 

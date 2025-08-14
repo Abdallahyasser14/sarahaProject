@@ -7,7 +7,7 @@ const dbConnection = async () => {
 try 
 {
     // Connect to the MongoDB database in 30 seconds by default
-    await mongoose.connect("mongodb://localhost:27017/sarahah_app",{serverSelectionTimeoutMS: 30000});
+    await mongoose.connect(process.env.DB_URL_LOCAL,{serverSelectionTimeoutMS: 30000});
                                                                      // u can change it but the default is 30 seconds 
     
 console.log('Database connected successfully');

@@ -1,11 +1,11 @@
 import crypto from 'crypto';
 import { buffer, text } from 'stream/consumers';
 import fs from 'fs';
-const IV_LENGTH=16
+const IV_LENGTH=+process.env.IV_LENGTH
 // IV is a random value that is used to make the encryption more secure it won't affect the decryption process because we will use the same iv to decrypt the data
 // IV is not encrypted it is just used to make the encryption more secure 
 
-const ENCRYPTION_SECRET_KEY=Buffer.from('12345678901234567890123456789012'); 
+const ENCRYPTION_SECRET_KEY=Buffer.from(process.env.ENCRYPTION_SECRET_KEY); 
 // this is a secret key that will be used to encrypt and decrypt the data , bufferfrom returns binary and it is a must format for the crypto function
 // IN SYMMETRIC ENCRYPTION WE USE THE SAME KEY TO ENCRYPT AND DECRYPT THE DATA
 
