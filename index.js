@@ -1,4 +1,4 @@
-import 'dotenv/config'; // MUST be first — runs before any other import
+import 'dotenv/config'; // MUST be first — runs before any other import 3shan law ay import uses env variables
 
 import express from 'express';
 import dbConnection from './src/DB/Models/db.connection.js';
