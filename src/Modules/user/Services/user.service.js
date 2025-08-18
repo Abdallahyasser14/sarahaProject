@@ -400,3 +400,50 @@ res.status(200).json({users})
 }
 
 
+export const forgetPasswordUser =async(req,res)=>
+{
+    try{
+        const {email}=req.body;
+        const user=await User.findOne({email});
+        if(!user){
+            return res.status(404).json({message:"User not found"});
+        }
+        const otp=generateOTP();
+        user.otps.resetPassword=otp;
+        await user.save();
+      eventEmitter.emit("sendEmail",{
+        to:user.email,
+        subject:"Forget Password",
+        html:`<p>your otp is ${otp}</p>`
+    })
+    res.status(200).json({message:"Otp sent successfully"})
+    }
+    catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const confirmForgetPasswordUser =async(req,res)=>
+{
+    try {
+        const {email,otp,password}=req.body;
+        const user=await User.findOne({email});
+        if(!user){
+            return res.status(404).json({message:"User not found"});
+        }
+        const isOtpMatched=bcrypt.compareSync(otp,user.otps?.resetPassword);
+        if(!isOtpMatched){
+            return res.status(401).json({message:"Invalid OTP"});
+        }
+        user.password=bcrypt.hashSync(password,10);
+        user.otps.resetPassword=undefined;
+        await user.save();
+        res.status(200).json({message:"Password updated successfully"});
+
+    }
+    catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}

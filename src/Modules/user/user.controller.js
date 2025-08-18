@@ -10,6 +10,8 @@ userRouter.delete('/delete/:userId', userService.DeleteService); // Route to del
 userRouter.get('/list',userService.ListUsers)
 userRouter.post('/signIn',userService.signInUser)
 userRouter.put('/confirm',userService.confirmUser)
+userRouter.post('/forgetPassword',userService.forgetPasswordUser)
+userRouter.put('/confirmForgetPassword',userService.confirmForgetPasswordUser)
 
 // we will encrypt the phone number when the user sign up and decrypt it when the user retrieve or view their profile 
 
