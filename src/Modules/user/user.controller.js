@@ -5,7 +5,7 @@ const userRouter = Router();
 
 
 userRouter.post('/add',userService.addUser); // Route to add a new user
-userRouter.put('/update/:userId', userService.UpdateService); // Route to update an existing user by ID
+userRouter.put('/update', userService.UpdateService); // Route to update an existing user by ID
 userRouter.delete('/delete/:userId', userService.DeleteService); // Route to delete a user by ID
 userRouter.get('/list',userService.ListUsers)
 userRouter.post('/signIn',userService.signInUser)

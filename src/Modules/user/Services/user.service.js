@@ -6,6 +6,10 @@ import { sendEmail } from "../../../Utils/send-email.utils.js";
 import { customAlphabet,nanoid } from "nanoid";    
 import { EventEmitter} from 'events';
 import {eventEmitter} from "../../../Utils/send-email.utils.js";
+import jwt from "jsonwebtoken";
+import {v4 as uuidv4} from "uuid";
+import {verifyToken} from "../../../Utils/tokens.utils.js";
+import {generateToken} from "../../../Utils/tokens.utils.js";
 const OTP_generate = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
 export const addUser = async (req, res) =>
 {
@@ -178,10 +182,45 @@ export const signInUser = async (req, res) =>
         // decrypt the phone number
         const decryptPhoneNumber=assymetricDecryption(user.phoneNumber);
         userData.phoneNumber=decryptPhoneNumber;
-        return res.status(200).json({
-            message: 'User signed in successfully',
-            user: userData
+//! session 11 week 2 authentication
+// generate the token for the user
+const accesstoken=generateToken({id:user._id,email:user.email},process.env.JWT_SECRET_KEY, // return the token in string
+                                                          //? secret key using in jwt.sign() is the same as the one in jwt.verify()
+
+                                                          //? options for the token
+                                                          {issuer:"saraha",subject:"user",expiresIn:process.env.ACCESS_TOKEN_EXPIRATION,jwtid:uuidv4()}
+                                                                                                        //? jwtid is a unique identifier for the token to revoke it in a while
+        );
+        return res.status(200).json({ 
+            message: 'User signed in successfully', 
+              //! session 11 week 2 authentication instead of returning the user data we will return the token
+
+              //? generate the token for the user
+
+              //**
+              //* there are 2 types of tokens
+              //* 1- access token : get the logged in user data . 3shan a3raf ma3lomat el user ely 3amel login now
+              //* 2- refresh token : get a new access token after the access token expires or **revoked** (ahsan ma t5ly el user y3tla3 we y3ml login again to get a new access token)
+              //  */  
+
+              //! we have 2 steps
+              //! 1- generate the token => jwt.sign()
+
+              //! 2- return the token =>jwt.verify()  betfok el token lma yerga3 men el frontend
+
+              //!? jwt.sign() takes 3 parameters
+              //!? 1- payload : the data we want to store in the token  
+              //!? 2- secret : the secret key to sign the token : your signature key same as the one in the jwt.verify() when u decrypt the token this is the symmetric encryption key
+              //!? 3- options : the options for the token : like expiration time
+
+              //!? jwt.verify() takes 2 parameters
+              //!? 1- token : the token to verify
+              //!? 2- secret : the secret key to verify the token
+
+            accesstoken
         });
+
+     
     } catch (error) {
         console.error('Error signing in user:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -196,14 +235,26 @@ export const signInUser = async (req, res) =>
  * * findByIdAndUpdate => to find a document by id and update it
  * * findOneAndUpdate => to find one document that matches the query and update it
  */
-export const UpdateService = async (req, res) => {  // ye3ml update lel user ay haga ela el password because it is sensitive data and has different logic
+export const UpdateService = async (req, res) => {  
+    // ye3ml update lel user ay haga ela el password because it is sensitive data and has different logic
     try {
-const { userId } = req.params; // Assuming userId is passed as a URL parameter
-        const { firstName, lastName, age,email,gender } = req.body;
+
+
+       
+        //! week 11 session2 authentication
+        //const { userId } = req.params; // Assuming userId is passed as a URL parameter
+        // it isnt safe to make this step without authentication so we will use the user id from the token 
+        // en el user ha3yml login wenta testanteg men el token el user el mafrood el front fel update api hayb3at lik el token
+        const {accesstoken}=req.headers;
+        const decodedToken=verifyToken(accesstoken,process.env.JWT_SECRET_KEY); //? verify the token
+        const userId=decodedToken.id; //? get the user id from the token
+ const { firstName, lastName, age,email,gender } = req.body;
         const user =await User.findById(userId); // Find the user by ID
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+        console.log(user);
+        console.log(decodedToken);
     /*  SAVE METHOD
         / Update the user fields with save method
         user.firstName = firstName || user.firstName; // Update only if provided
@@ -284,10 +335,9 @@ const updatedUser = await User.findByIdAndUpdate(
 }
     catch (error) {
         console.error('Error updating user:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error',error });
     }
 }
-
 
 // hard delete user
 
@@ -326,7 +376,6 @@ export const DeleteService = async (req, res) => {
 
 
 }
-
 
 export const ListUsers =async(req,res)=>
 {
