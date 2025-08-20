@@ -192,6 +192,16 @@ const accesstoken=generateToken({id:user._id,email:user.email},process.env.JWT_S
                                                           {issuer:"saraha",subject:"user",expiresIn:process.env.ACCESS_TOKEN_EXPIRATION,jwtid:uuidv4()}
                                                                                                         //? jwtid is a unique identifier for the token to revoke it in a while
         );
+
+//! session 12 week 1 authentication 
+//? generate the refresh token for the user el front haykalem el api bi lma ye5las el time
+        const refreshtoken=generateToken({id:user._id,email:user.email},process.env.JWT_SECRET_KEY, // return the token in string
+                                                          //? secret key using in jwt.sign() is the same as the one in jwt.verify()
+
+                                                          //? options for the token
+                                                          {issuer:"saraha",subject:"user",expiresIn:process.env.REFRESH_TOKEN_EXPIRATION,jwtid:uuidv4()}
+                                                                                                        //? jwtid is a unique identifier for the token to revoke it in a while
+        );
         return res.status(200).json({ 
             message: 'User signed in successfully', 
               //! session 11 week 2 authentication instead of returning the user data we will return the token
@@ -218,7 +228,8 @@ const accesstoken=generateToken({id:user._id,email:user.email},process.env.JWT_S
               //!? 1- token : the token to verify
               //!? 2- secret : the secret key to verify the token
 
-            accesstoken
+            accesstoken,
+            refreshtoken
         });
 
      
@@ -500,3 +511,30 @@ export const logoutUser =async(req,res)=>
 
 
     }
+
+
+export const RefreshTokenService =async(req,res)=>  // refresh token service takes the refresh token from the request and returns a new access token
+{
+    try {
+        const {refreshtoken}=req.headers;
+        const decodedToken=verifyToken(refreshtoken,process.env.JWT_SECRET_KEY); //? verify the token
+        const accesstoken=generateToken({id:decodedToken.id,email:decodedToken.email},process.env.JWT_SECRET_KEY, // return the token in string
+                                                          //? secret key using in jwt.sign() is the same as the one in jwt.verify()
+
+                                                          //? options for the token
+                                                          {issuer:"saraha",subject:"user",expiresIn:process.env.ACCESS_TOKEN_EXPIRATION,jwtid:uuidv4()}
+                                                                                                        //? jwtid is a unique identifier for the token to revoke it in a while
+        );
+    
+  
+      
+        
+        
+    
+        return res.status(200).json({message:"User logged out successfully",accesstoken});
+    }
+    catch (error) {
+        console.error('Error refreshing token:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
