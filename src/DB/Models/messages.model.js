@@ -12,6 +12,8 @@ const messageSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
         ref:"User" //? this is the name of the collection in the database that the model is based on
+        // dorha el waheed when we nedd to get the information of the user who received the message 
+        //
     },
     timestamp: {
         type: Date,
