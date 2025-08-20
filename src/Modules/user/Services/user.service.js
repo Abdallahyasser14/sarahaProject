@@ -10,6 +10,7 @@ import jwt from "jsonwebtoken";
 import {v4 as uuidv4} from "uuid";
 import {verifyToken} from "../../../Utils/tokens.utils.js";
 import {generateToken} from "../../../Utils/tokens.utils.js";
+import {BlacklistedTokens} from "../../../DB/Models/black-listed-tokens.model.js";
 const OTP_generate = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
 export const addUser = async (req, res) =>
 {
@@ -255,6 +256,11 @@ export const UpdateService = async (req, res) => {
         }
         console.log(user);
         console.log(decodedToken);
+
+        const blaclistfind=await BlacklistedTokens.findOne({tokenId:decodedToken.jti});
+        if(blaclistfind){
+            return res.status(401).json({message:"Token is blacklisted"});
+        }
     /*  SAVE METHOD
         / Update the user fields with save method
         user.firstName = firstName || user.firstName; // Update only if provided
@@ -447,3 +453,44 @@ export const confirmForgetPasswordUser =async(req,res)=>
         res.status(500).json({ message: 'Internal server error' });
     }
 }
+
+
+//? blacklisted tokens
+// when user logs out we will add the token to the blacklisted tokens array so when we verify the token we will check if the token is in the blacklisted tokens array
+// we will create a blacklist model to store the blacklisted tokens we will store userid and token id and token expiration date because if it is expired we will remove it from the blacklisted tokens array
+// we must use redis(like firebase) to store the blacklisted tokens because it is faster than mongodb
+// we store the blacklisted tokens because if the user catches them they can use them to access the api and do actions on behalf of the user 
+export const logoutUser =async(req,res)=>
+
+   
+    {
+       
+        try {
+            const {accesstoken}=req.headers;
+            const decodedToken=verifyToken(accesstoken,process.env.JWT_SECRET_KEY); //? verify the token
+            const userId=decodedToken.id; //? get the user id from the token
+            const user=await User.findById(userId);
+            if(!user){
+                return res.status(404).json({message:"User not found"});
+            }
+            const blacklistedToken=new BlacklistedTokens({
+             
+                tokenId:decodedToken.jti,
+                expirationDate:new Date(decodedToken.exp*1000) // convert the expiration date to milliseconds
+                   //? add the token to the blacklisted tokens array best practice to add it in reddis
+            })
+            await blacklistedToken.save();
+          
+            
+            
+        
+            res.status(200).json({message:"User logged out successfully"});
+        }
+        catch (error) {
+            console.error('Error logging out user:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+
+
+
+    }

@@ -12,7 +12,7 @@ userRouter.post('/signIn',userService.signInUser)
 userRouter.put('/confirm',userService.confirmUser)
 userRouter.post('/forgetPassword',userService.forgetPasswordUser)
 userRouter.put('/confirmForgetPassword',userService.confirmForgetPasswordUser)
-
+userRouter.post('/logout',userService.logoutUser)
 // we will encrypt the phone number when the user sign up and decrypt it when the user retrieve or view their profile 
 
 export default userRouter;
