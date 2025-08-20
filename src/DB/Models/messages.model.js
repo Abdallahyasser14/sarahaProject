@@ -13,10 +13,6 @@ const messageSchema = new mongoose.Schema({
         required: true,
         ref:"User" //? this is the name of the collection in the database that the model is based on
     },
-    message: {
-        type: String,
-        required: true
-    },
     timestamp: {
         type: Date,
         default: Date.now
