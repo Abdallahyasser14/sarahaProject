@@ -246,21 +246,25 @@ export const UpdateService = async (req, res) => {
         //const { userId } = req.params; // Assuming userId is passed as a URL parameter
         // it isnt safe to make this step without authentication so we will use the user id from the token 
         // en el user ha3yml login wenta testanteg men el token el user el mafrood el front fel update api hayb3at lik el token
-        const {accesstoken}=req.headers;
-        const decodedToken=verifyToken(accesstoken,process.env.JWT_SECRET_KEY); //? verify the token
-        const userId=decodedToken.id; //? get the user id from the token
- const { firstName, lastName, age,email,gender } = req.body;
+    //     const {accesstoken}=req.headers;
+    //     const decodedToken=verifyToken(accesstoken,process.env.JWT_SECRET_KEY); //? verify the token
+    //     const userId=decodedToken.id; //? get the user id from the token
+ 
+    // const blaclistfind=await BlacklistedTokens.findOne({tokenId:decodedToken.jti});
+    //     if(blaclistfind){
+    //         return res.status(401).json({message:"Token is blacklisted"});
+    //     }
+ 
+    const userId=req.loggedInUser._id;
+        const { firstName, lastName, age,email,gender } = req.body;
         const user =await User.findById(userId); // Find the user by ID
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
         console.log(user);
-        console.log(decodedToken);
+    
 
-        const blaclistfind=await BlacklistedTokens.findOne({tokenId:decodedToken.jti});
-        if(blaclistfind){
-            return res.status(401).json({message:"Token is blacklisted"});
-        }
+     
     /*  SAVE METHOD
         / Update the user fields with save method
         user.firstName = firstName || user.firstName; // Update only if provided
@@ -358,7 +362,8 @@ export const DeleteService = async (req, res) => {
     
     try
     {
-        const { userId } = req.params; // Assuming userId is passed as a URL parameter
+        const userId=req.loggedInUser._id;  // gay men el auth middleware 
+        // Assuming userId is passed as a URL parameter
 
         // Find the user by ID and delete it
         const deletedUser = await User.findByIdAndDelete(userId);
