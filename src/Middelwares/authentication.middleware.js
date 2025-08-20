@@ -31,6 +31,8 @@ export const authenticationMiddleware = async (req, res, next) => {
         }
 
         req.loggedInUser=user; //! info of the user is stored in the request object to be used in the the rest srevice so we dont get the data from the database again
+        req.tokenId=decodedToken.jti;
+        req.expirationDate=decodedToken.exp;
         next();
     }
     catch (error) {

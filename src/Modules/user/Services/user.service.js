@@ -471,17 +471,18 @@ export const logoutUser =async(req,res)=>
     {
        
         try {
-            const {accesstoken}=req.headers;
-            const decodedToken=verifyToken(accesstoken,process.env.JWT_SECRET_KEY); //? verify the token
-            const userId=decodedToken.id; //? get the user id from the token
+            // const {accesstoken}=req.headers;
+            // const decodedToken=verifyToken(accesstoken,process.env.JWT_SECRET_KEY); //? verify the token
+            // const userId=decodedToken.id; //? get the user id from the token
+            const userId=req.loggedInUser._id; //! men el auth middleware 
             const user=await User.findById(userId);
             if(!user){
                 return res.status(404).json({message:"User not found"});
             }
             const blacklistedToken=new BlacklistedTokens({
              
-                tokenId:decodedToken.jti,
-                expirationDate:new Date(decodedToken.exp*1000) // convert the expiration date to milliseconds
+                tokenId:req.tokenId,
+                expirationDate:new Date(req.expirationDate*1000) // convert the expiration date to milliseconds
                    //? add the token to the blacklisted tokens array best practice to add it in reddis
             })
             await blacklistedToken.save();
