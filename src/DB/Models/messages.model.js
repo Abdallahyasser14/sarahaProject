@@ -25,3 +25,13 @@ const messageSchema = new mongoose.Schema({
 const Message = mongoose.model('Message', messageSchema);
 
 export default Message;
+
+
+
+//** relationships in mongoDb are 2 types
+// * Parent child relationship
+// * => ana wa2ef fein 3nd ely has maslna hena user has messages we el message heya ely fiha el key 
+// *  BHDAED EL RELATIONSHIP 3LA HASAB MIN 3AREF MIN I MEAN EN HEAN EL USER MESH GOWAA AY M3LOMA TE2OL TO HIM WHO ARE ITS CHILDS 
+// * child parent relationship
+//* => HENA EL CHILD 3ANDO MA3LOMA YE2LO MIN EL PARENT
+//  */

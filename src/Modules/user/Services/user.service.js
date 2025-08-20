@@ -403,14 +403,8 @@ export const ListUsers =async(req,res)=>
 {
     try
     {
-     let users=await User.find()
-     users=users.map((user)=> 
-    { return{
-        ...user._doc,
-        phoneNumber:assymetricDecryption(user.phoneNumber)
-     }
-    }
-    )
+     let users=await User.find().populate("Messages")
+    
 res.status(200).json({users})
 }
 

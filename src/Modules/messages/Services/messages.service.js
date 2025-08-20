@@ -22,11 +22,11 @@ export const sendMessageService = async (req, res) => {
 export const getMessagesService = async (req, res) => {
     try {
         const {receiverId}=req.body;
-        const messages=await Message.find({receiverId}).populate({
+        const messages=await Message.find({receiverId}).populate([{
 
             path:"receiverId", // this is the name of the field in the message model that references the user model
-            select:"firstName lastName" // this is the fields that we want to include in the response
-        });
+            select:"firstName lastName" // this is the fields that we want to include in the response 
+        }]);
         return res.status(200).json({messages});
     }
     catch (error) {

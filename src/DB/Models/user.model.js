@@ -94,6 +94,10 @@ isConfirmed:{
     // {} el object el tany el options b2a w keda 
     ,
     {
+        toObject:
+        {
+            virtuals: true, // this will include the virtual fields in the response when we call toObject on the model instance
+        },
 
         toJSON:
         {
@@ -150,8 +154,12 @@ userSchema.index({firstName: 1, lastName: 1}, {unique: true}); // create a uniqu
 
 
 
-
-
+//** virtuals 3shan 3mlna relationship between user and message bs el user ma3yrffsh el messages  fbnst5dm virtuals law ana fi child parent relationship we wa2ef 3nd el parent and i want to know el child info 
+userSchema.virtual("Messages",{
+    ref:"Message",
+    localField:"_id", // this is the field in the user model that references the message model ya3ni we wana wa2ef mkany ana rabet nfsy beih aw marboot b eih m3 el taraf el tany
+    foreignField:"receiverId" // this is the field in the message model that references the user model
+})
 
 
 
