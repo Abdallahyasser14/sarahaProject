@@ -21,4 +21,4 @@ catch (error)
 }
 }
 
-export default dbConnection;
+export default dbConnection; 
