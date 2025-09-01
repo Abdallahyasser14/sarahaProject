@@ -20,7 +20,7 @@ export const addUser = async (req, res) =>
     const otp=OTP_generate();
 
     try 
-    {   const{ firstName, lastName, age,email, password,gender,phoneNumber } = req.body;
+    {   const{ firstName, lastName, age,email, password,gender,phoneNumber,role } = req.body;
         // Validate the input data
 
         // lazem ne3ml find el user by email to check if the user already exists abl ma ne3ml create 3shan el error yegy menna mesh men el database

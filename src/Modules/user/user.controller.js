@@ -1,6 +1,10 @@
 import {Router} from 'express';
 import * as userService from './Services/user.service.js'; // Assuming addUser is defined in user.service.js
 import { authenticationMiddleware } from '../../Middelwares/authentication.middleware.js';
+import { authorizationMiddleware } from '../../Middelwares/authorization.middleware.js';
+
+
+
 const userRouter = Router();
 
 
@@ -19,9 +23,9 @@ userRouter.post('/logout', authenticationMiddleware,userService.logoutUser)
 
 
 // admin operation autherization
-userRouter.get('/list',userService.ListUsers)
+userRouter.get('/list',authenticationMiddleware, authorizationMiddleware(["admin"]),userService.ListUsers)
 
-
+                                                 
 /***!! any authorization needs ya3ni el admin maslan
  ** allowd roles masmoh lemin yed5lo 
  ** we el role beta3 el user ely 3male login delwa2ty 3hsan law ok ye5osh
