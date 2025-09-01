@@ -11,7 +11,10 @@ import {v4 as uuidv4} from "uuid";
 import {verifyToken} from "../../../Utils/tokens.utils.js";
 import {generateToken} from "../../../Utils/tokens.utils.js";
 import {BlacklistedTokens} from "../../../DB/Models/black-listed-tokens.model.js";
+import mongoose from "mongoose";
+import Message from "../../../DB/Models/messages.model.js";
 const OTP_generate = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
+
 export const addUser = async (req, res) =>
 {
     const otp=OTP_generate();
@@ -370,18 +373,34 @@ const updatedUser = await User.findByIdAndUpdate(
  ** * * findOneAndDelete => to find one document that matches the query and delete it and return it 
  */
 export const DeleteService = async (req, res) => {
-    
-    try
-    {
+      //? start session
+      const session=await mongoose.startSession();
+        
+  
+        req.session=session;
         const userId=req.loggedInUser._id;  // gay men el auth middleware 
         // Assuming userId is passed as a URL parameter
 
+        //? start transaction
+        session.startTransaction();
+
         // Find the user by ID and delete it
-        const deletedUser = await User.findByIdAndDelete(userId);
+        const deletedUser = await User.findByIdAndDelete(userId,{session}); //* Note that we pass the session as an option to the findByIdAndDelete method to save on the session mot in the db
         if (!deletedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
+//! sessioon 2 week 12 transactions 
+//? we will delete the messages that are related to the user and we want to be as a block transaction process
+       await Message.deleteMany({receiverId:userId},{session}); //* Note that we pass the session as an option to the deleteMany method to save on the session mot in the db
 
+
+       //? commit transaction
+      await session.commitTransaction();
+
+       //? end session
+       session.endSession();
+      
+      
         // Return a success message
         res.status(200).json({
         
@@ -389,12 +408,16 @@ export const DeleteService = async (req, res) => {
             user: deletedUser // Return the deleted user data
         });
 
-    }
+ 
 
-    catch (error) {
+   
+        //? rollback transaction
+       await session.abortTransaction();
+        //? end session
+        session.endSession();
         console.error('Error deleting user:', error);
         res.status(500).json({ message: 'Internal server error' });
-    }
+  
 
 
 }

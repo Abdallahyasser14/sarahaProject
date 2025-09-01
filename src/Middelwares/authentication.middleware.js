@@ -8,12 +8,15 @@ import User from "../DB/Models/user.model.js";
 export const authenticationMiddleware = async (req, res, next) => { 
      // the step of authentication before the request reaches the controller
     try {
-        const {accesstoken}=req.headers;
+        const {authorization: accesstoken}=req.headers;
         if(!accesstoken){
             return res.status(401).json({message:"Access token is required"});
         }
 
-        const decodedToken=verifyToken(accesstoken,process.env.JWT_SECRET_KEY); //? verify the token
+        const [prefix, token ]= accesstoken.split(' ');
+       
+
+        const decodedToken=verifyToken(token,process.env.JWT_SECRET_KEY); //? verify the token
         if (!decodedToken.jti){
             return res.status(401).json({message:"Invalid token"});
         }

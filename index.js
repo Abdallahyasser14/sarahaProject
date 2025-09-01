@@ -14,9 +14,12 @@ dbConnection();
 app.use(express.json());
 app.use("/users",userRouter);
 app.use("/messages",messageRouter);
-app.use((err,req,res,next)=>{          //!  error handling middleware this is an internal error handler middleware
+app.use(async (err,req,res,next)=>{          //!  error handling middleware this is an internal error handler middleware
     console.log(err);
-    res.status(500).json({message:"Internal server error"});
+    if(req.session && req.session.inTransaction()){
+    await req.session.abortTransaction();
+    req.session.endSession();}
+    res.status(500).json({message:"Internal server error here",err });
 })
 app.listen(process.env.PORT, () => {
     console.log('Server is running on port 3000');});

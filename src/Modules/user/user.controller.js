@@ -17,4 +17,17 @@ userRouter.put('/confirmForgetPassword',userService.confirmForgetPasswordUser)
 userRouter.post('/logout', authenticationMiddleware,userService.logoutUser)
 // we will encrypt the phone number when the user sign up and decrypt it when the user retrieve or view their profile 
 
+
+// admin operation autherization
+userRouter.get('/list',userService.ListUsers)
+
+
+/***!! any authorization needs ya3ni el admin maslan
+ ** allowd roles masmoh lemin yed5lo 
+ ** we el role beta3 el user ely 3male login delwa2ty 3hsan law ok ye5osh
+ ** => di keda middelware laze teb2a b3l el authentication
+ */
+
+
+
 export default userRouter;
