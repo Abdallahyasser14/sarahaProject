@@ -27,7 +27,7 @@ export const validationMiddleware=(schema)=>{  //? ay middleware benehtag eno ya
         if(validationErrors.length>0){
             return res.status(400).json({message:"Validation failed",errors:validationErrors});
         }
-        
+
         next();
     }
 
