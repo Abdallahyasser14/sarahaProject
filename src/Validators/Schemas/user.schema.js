@@ -1,4 +1,11 @@
 import Joi from "joi";
+import { isValidObjectId } from "mongoose";
+
+
+function objectValidation (value,helper){
+    return isValidObjectId(value)? helper.message("Invalid object ID") : value;
+    
+}
 
 export const SignUpSchema={   //! normal js object that has objects inside it beta3 el hagat ely gaya fel request  
 
@@ -14,6 +21,7 @@ export const SignUpSchema={   //! normal js object that has objects inside it be
    //? keda rabatohom be ba3d en lazem yeb2o equal
    phoneNumber:Joi.string().required(),
    role:Joi.string().required().valid("admin","user"),
+   _id:Joi.string().custom(objectValidation), //? custom validation  if ur validation hasnt a pre defined one u can create a custom one
 
    // .valid () beta5od magmo3a men el enums
             })
