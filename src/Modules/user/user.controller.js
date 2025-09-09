@@ -20,6 +20,7 @@ userRouter.post('/refreshToken',userService.RefreshTokenService)
 userRouter.post('/forgetPassword',userService.forgetPasswordUser)
 userRouter.put('/confirmForgetPassword',userService.confirmForgetPasswordUser)
 userRouter.post('/logout', authenticationMiddleware,userService.logoutUser)
+userRouter.post('/signup-gmail',userService.SignUpServiceGmail)
 // we will encrypt the phone number when the user sign up and decrypt it when the user retrieve or view their profile 
 
 

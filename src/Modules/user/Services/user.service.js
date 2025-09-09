@@ -13,6 +13,7 @@ import {generateToken} from "../../../Utils/tokens.utils.js";
 import {BlacklistedTokens} from "../../../DB/Models/black-listed-tokens.model.js";
 import mongoose from "mongoose";
 import Message from "../../../DB/Models/messages.model.js";
+import {OAuth2Client} from "google-auth-library";
 const OTP_generate = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
 
 export const addUser = async (req, res) =>
@@ -554,4 +555,76 @@ export const RefreshTokenService =async(req,res)=>  // refresh token service tak
         console.error('Error refreshing token:', error);
         return res.status(500).json({ message: 'Internal server error' });
     }
+}
+
+
+export const SignUpServiceGmail =async(req,res)=>
+{
+ const {idToken}=req.body;
+    const client=new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const ticket = await client.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const {email,given_name,family_name,email_verified,sub} = ticket.getPayload();
+      if(!email_verified){
+        return res.status(401).json({message:"Email not verified"});
+      }
+      const isUser=await User.findOne({googleSub:sub});
+      if(isUser){
+        isUser.email=email;
+        isUser.firstName=given_name;
+        isUser.lastName=family_name;
+        await isUser.save();
+        const accesstoken=generateToken({id:isUser._id,email:isUser.email},process.env.JWT_SECRET_KEY, // return the token in string
+            //? secret key using in jwt.sign() is the same as the one in jwt.verify()
+    
+            //? options for the token
+            {issuer:"saraha",subject:"user",expiresIn:process.env.ACCESS_TOKEN_EXPIRATION,jwtid:uuidv4()}
+                                                          //? jwtid is a unique identifier for the token to revoke it in a while
+    );
+    
+    //! session 12 week 1 authentication 
+    //? generate the refresh token for the user el front haykalem el api bi lma ye5las el time
+    const refreshtoken=generateToken({id:isUser._id,email:isUser.email},process.env.JWT_SECRET_KEY, // return the token in string
+            //? secret key using in jwt.sign() is the same as the one in jwt.verify()
+    
+            //? options for the token
+            {issuer:"saraha",subject:"user",expiresIn:process.env.REFRESH_TOKEN_EXPIRATION,jwtid:uuidv4()}
+                                                          //? jwtid is a unique identifier for the token to revoke it in a while
+    );
+
+        return res.status(200).json({message:"User already exists",accesstoken,refreshtoken});
+      }
+      const user=new User({
+        email,
+        firstName:given_name,
+        lastName:family_name || " ",
+        provider:"google",
+        password:bcrypt.hashSync(nanoid(),+process.env.SALT_ROUNDS),
+        isConfirmed:true,
+        googleSub:sub
+      })
+      await user.save();
+    
+
+      const accesstoken=generateToken({id:user._id,email:user.email},process.env.JWT_SECRET_KEY, // return the token in string
+        //? secret key using in jwt.sign() is the same as the one in jwt.verify()
+
+        //? options for the token
+        {issuer:"saraha",subject:"user",expiresIn:process.env.ACCESS_TOKEN_EXPIRATION,jwtid:uuidv4()}
+                                                      //? jwtid is a unique identifier for the token to revoke it in a while
+);
+
+//! session 12 week 1 authentication 
+//? generate the refresh token for the user el front haykalem el api bi lma ye5las el time
+const refreshtoken=generateToken({id:user._id,email:user.email},process.env.JWT_SECRET_KEY, // return the token in string
+        //? secret key using in jwt.sign() is the same as the one in jwt.verify()
+
+        //? options for the token
+        {issuer:"saraha",subject:"user",expiresIn:process.env.REFRESH_TOKEN_EXPIRATION,jwtid:uuidv4()}
+                                                      //? jwtid is a unique identifier for the token to revoke it in a while
+);
+
+return res.status(200).json({message:"User signed up successfully",accesstoken,refreshtoken});
 }

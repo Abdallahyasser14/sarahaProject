@@ -26,10 +26,9 @@ firstName: {
 lastName: {
     type: String,
     required: true,
-    minLength: [2,"min length is 2"],
-    maxLength: 50,
-    lowercase: true,
-    trim: true
+   
+    lowercase: true
+  
 },
 
 age :
@@ -37,7 +36,6 @@ age :
 
 {
     type: Number,
-    required: true,
     min: [0,"age must be greater than or equal to 0"],
     max: [120,"age must be less than or equal to 120"],
     index : true // create an index on the age field for faster queries bs howa haye3ml leih esm men nafso
@@ -72,7 +70,7 @@ password: {
 
 phoneNumber: {
     type: String,
-    required: true,
+  //  required: true,
   //  unique: true, // unique index on the phoneNumber field
     trim: true, // remove spaces from the start and end
     set(value) {
@@ -90,7 +88,16 @@ otps:{
 isConfirmed:{
     type:Boolean,
     default:false
-}
+},
+provider:{
+    type:String,
+    enum:["google","facebook","twitter","local"],
+    default:"local"
+},
+googleSub:{
+    type:String,
+    unique:true
+},
 
 
 

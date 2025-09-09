@@ -5,6 +5,8 @@ import dbConnection from './src/DB/Models/db.connection.js';
 import userRouter from './src/Modules/user/user.controller.js';
 import messageRouter from './src/Modules/messages/messages.controller.js';
 import bcrypt from 'bcrypt';
+import cors from 'cors';
+import { OAuth2Client } from 'google-auth-library';
 
 const app = express();
 // Connect to the database it will retry to connect if it fails until it time out
@@ -12,6 +14,17 @@ const app = express();
 dbConnection();
 
 app.use(express.json());
+const whiteList=process.env.WHITE_LISTED_ORIGINS;
+app.use(cors({
+    origin:(origin,callback)=>{
+        if(whiteList.includes(origin)){
+            callback(null,true);
+        }
+        else{
+            callback(new Error("Not allowed by CORS"));
+        }
+    }
+}));
 app.use("/users",userRouter);
 app.use("/messages",messageRouter);
 

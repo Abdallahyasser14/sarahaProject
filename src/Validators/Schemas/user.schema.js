@@ -30,7 +30,7 @@ export const SignUpSchema={   //! normal js object that has objects inside it be
     
     {is:"flat", // the condition is what
         then:Joi.number().min(0).max(100), // if the condition is true then the value must be between 0 and 100
-        else:Joi.number().min(0).max(50)}), // if the condition is false then the value must be between 0 and 50
+        otherwise:Joi.number().min(0).max(50)}), // if the condition is false then the value must be between 0 and 50
    
    // .valid () takes 
             })//.with('email','confirmPassword')    // */ law 3awez te3m peer keda el email optional law mesh 3amel 3ando required ya3ny bs law geh so confirm pass b2a required heya di el peer en hagtin yego ma3 b3d
