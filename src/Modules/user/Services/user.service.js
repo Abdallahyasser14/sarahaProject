@@ -35,7 +35,7 @@ export const addUser = async (req, res) =>
 // we 3andena conition tany unique 3la el firstName and lastName so we will cehck the email or the combination of firstName and lastName both if any of them exists => error
          const isEmailExists = await User.findOne({ 
             
-             $or:[{email: email}, {firstName: firstName, lastName: lastName}]
+             $and:[{email: email},{provider:"local"}]
                                                     //and
         });
          if (isEmailExists)
@@ -160,7 +160,7 @@ export const signInUser = async (req, res) =>
         }
 
         // Find the user by email
-        const user = await User.findOne({ email }).select("+password");
+        const user = await User.findOne({ email,provider:"local" }).select("+password");
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -570,7 +570,7 @@ export const SignUpServiceGmail =async(req,res)=>
       if(!email_verified){
         return res.status(401).json({message:"Email not verified"});
       }
-      const isUser=await User.findOne({googleSub:sub});
+      const isUser=await User.findOne({googleSub:sub,provider:"google"});
       if(isUser){
         isUser.email=email;
         isUser.firstName=given_name;
