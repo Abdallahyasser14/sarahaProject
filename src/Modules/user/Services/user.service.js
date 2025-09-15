@@ -14,6 +14,7 @@ import {BlacklistedTokens} from "../../../DB/Models/black-listed-tokens.model.js
 import mongoose from "mongoose";
 import Message from "../../../DB/Models/messages.model.js";
 import {OAuth2Client} from "google-auth-library";
+import { uploadToCloudinary } from "../../../Common/Services/cloudinary.service.js";
 const OTP_generate = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
 
 export const addUser = async (req, res) =>
@@ -640,6 +641,13 @@ export const uploadProfile=async(req,res)=>{
      if(!user){
         return res.status(404).json({message:"User not found"});
      }
+     const uploadResult = await uploadToCloudinary(path,
+
+        {
+            folder:"Saraha_App_wednseday", // ye3ml file we keda fe cloudinary law mesh mawgood
+            
+        }
+     )
    
      user.profileImage=path;
      await user.save();

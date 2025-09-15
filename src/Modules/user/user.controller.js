@@ -22,7 +22,7 @@ userRouter.put('/confirmForgetPassword',userService.confirmForgetPasswordUser)
 userRouter.post('/logout', authenticationMiddleware,userService.logoutUser)
 userRouter.post('/signup-gmail',userService.SignUpServiceGmail)
 // we will encrypt the phone number when the user sign up and decrypt it when the user retrieve or view their profile 
-userRouter.post('/upload-profile',localUpload("profile").single("profile"),userService.uploadProfile)
+userRouter.post('/upload-profile',authenticationMiddleware,localUpload("profile").single("profile"),userService.uploadProfile)
 
 // admin operation autherization
 userRouter.get('/list',authenticationMiddleware, authorizationMiddleware(["admin"]),userService.ListUsers)

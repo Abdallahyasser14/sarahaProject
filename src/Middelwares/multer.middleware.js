@@ -55,7 +55,27 @@ const storage = multer.diskStorage({
     })  
 }
 
-
+export const uploadHost=(limits={})=>{  // make this to benifit from parsing only
+    
+const storage=multer.diskStorage({})
+    
+      const fileFilter=(req,file,cb)=>{
+        // file.mimetype = image/jpeg  => hagib men el extensions el abl / we ashof ely b3d el / gowa wla l2a
+        const fileType=fileTypes[file.mimetype.split("/")[0]];
+        if(!fileType){
+            return cb(new Error("Invalid file type"),false);
+        }
+        
+        const fileExtension=file.originalname.split(".")[1];
+        if(!allowedFileExtensions[fileType].includes(fileExtension)){
+            return cb(new Error("Invalid file extension"),false);
+        }
+        
+        return cb(null,true);
+        
+      }
+        return multer({fileFilter   ,storage,limits})  
+    }
 //**
 //        *   multer upload options 
 
