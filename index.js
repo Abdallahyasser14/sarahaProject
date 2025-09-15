@@ -14,10 +14,12 @@ const app = express();
 dbConnection();
 
 app.use(express.json());
+app.use('/uploads',express.static('uploads')); // lama yegy upload  roh l upload folder  3shan ye3raf ya3ni eno msh router d2a static folder
 const whiteList=process.env.WHITE_LISTED_ORIGINS;
 app.use(cors({
     origin:(origin,callback)=>{
-        if(whiteList.includes(origin)){
+        console.log(origin);
+        if(whiteList.includes(origin) || !origin){
             callback(null,true);
         }
         else{

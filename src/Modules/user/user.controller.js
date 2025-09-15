@@ -4,7 +4,7 @@ import { authenticationMiddleware } from '../../Middelwares/authentication.middl
 import { authorizationMiddleware } from '../../Middelwares/authorization.middleware.js';
 import { validationMiddleware } from '../../Middelwares/validation.middleware.js';
 import { SignUpSchema } from '../../Validators/Schemas/user.schema.js';
-
+import {localUpload} from '../../Middelwares/multer.middleware.js';
 
 const userRouter = Router();
 
@@ -22,7 +22,7 @@ userRouter.put('/confirmForgetPassword',userService.confirmForgetPasswordUser)
 userRouter.post('/logout', authenticationMiddleware,userService.logoutUser)
 userRouter.post('/signup-gmail',userService.SignUpServiceGmail)
 // we will encrypt the phone number when the user sign up and decrypt it when the user retrieve or view their profile 
-
+userRouter.post('/upload-profile',localUpload("profile").single("profile"),userService.uploadProfile)
 
 // admin operation autherization
 userRouter.get('/list',authenticationMiddleware, authorizationMiddleware(["admin"]),userService.ListUsers)

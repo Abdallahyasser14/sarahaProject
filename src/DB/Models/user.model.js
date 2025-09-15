@@ -98,6 +98,10 @@ googleSub:{
     type:String,
     unique:true
 },
+profileImage:{
+    type:String,
+    default:""
+},
 
 
 

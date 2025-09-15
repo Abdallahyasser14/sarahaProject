@@ -628,3 +628,24 @@ const refreshtoken=generateToken({id:user._id,email:user.email},process.env.JWT_
 
 return res.status(200).json({message:"User signed up successfully",accesstoken,refreshtoken});
 }
+
+
+export const uploadProfile=async(req,res)=>{
+ 
+    try {
+     console.log(req.file);
+     const{_id}=req.loggedInUser;
+     const{path}=req.file;
+     const user=await User.findById(_id);
+     if(!user){
+        return res.status(404).json({message:"User not found"});
+     }
+   
+     user.profileImage=path;
+     await user.save();
+     res.status(200).json({message:"Profile uploaded successfully"})   
+    } catch (error) {
+        console.error('Error uploading profile:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
